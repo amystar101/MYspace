@@ -1,0 +1,55 @@
+
+
+<%- include('partials/top.ejs',{
+  name:name,
+  login:login
+}); %>
+
+
+<%  if(ismsg) {%>
+    <p style="text-align: center;"><%= msg %></p>
+<% } %>
+  
+
+
+
+          <div class = "container">
+            <form action="login" method="POST">
+                <input type="text" name="uname" id="" placeholder="USER NAME" required = "true">
+                <input type="password" name = "pwd" placeholder="PASSWORD" required>
+                <br><br>
+                <button class = "btn btn-success">LOG IN</button>
+            </form>
+            <h2>OR</h2>
+            <hr>
+            <form action="signup" method="POST">
+                <input type="text" name = "fname"placeholder = "FIRST NAME" required>
+                <input type="text" name = "lname"placeholder = "LAST NAME" required>
+                <br>
+                <input type="email" name = "email"placeholder = "EMAIL" required>
+                <br>
+                <input type="text" name="uname" id="" placeholder="USER NAME" required>
+                <input type="password" name = "pwd" placeholder="PASSWORD" required>
+                <br>
+                <br>
+                <button class = "btn btn-primary">SIGN UP</button>
+            </form>
+            <hr>
+            <hr>
+            <form action="deleteuser" method="POST">
+              <input type="text" name = "fname"placeholder = "FIRST NAME" required>
+              <input type="text" name = "lname"placeholder = "LAST NAME" required>
+              <br>
+              <input type="email" name = "email"placeholder = "EMAIL" required>
+              <br>
+              <input type="text" name="uname" id="" placeholder="USER NAME" required>
+              <input type="password" name = "pwd" placeholder="PASSWORD" required>
+              <br>
+              <br>
+              <button class = "btn btn-danger">DELETE USER</button>
+          </form>
+        </div>
+<%- include('partials/bottom.ejs'); %>
+
+
+         

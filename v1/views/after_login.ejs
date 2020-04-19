@@ -1,0 +1,34 @@
+<%-include("partials/top.ejs",{
+    login:login,
+    name:name
+}); %>
+<% if(is_upload_msg) { %>
+<h2 style="text-align: center;"><%= upload_msg %></h2>
+<% } %>
+<div class = "container">
+    <h4 id = "msg">SELECT FILE TO UPLOAD</h4>
+    <form method="POST" encType="multipart/form-data">
+        <input type="file" name = "data" id="data" required>
+        <br>
+        <button class="btn btn-success" type="button" onclick="myupload()">UPLOAD</button>
+    </form>
+</div>
+<br>
+<hr>
+<div class = "container">
+    <h2>YOUR PRECIOUS DATA</h2>
+    <ul id="parent">
+        <%for(i=0;i<user_data.length;i++){ %>
+            <li>
+                <a href=<%="download/" + user_data[i].name %>  class="data"> <%= user_data[i].name%></a>  
+                <a href=<%="delete/" + user_data[i].name %> class = "remove btn btn-danger">Remove</a>  
+            </li>
+            <br>
+        <%} %>
+
+
+        </ul>
+</div>
+<script src="js/after_login.js"></script>
+
+<%-include("partials/bottom.ejs"); %>

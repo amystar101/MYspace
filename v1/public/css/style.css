@@ -1,0 +1,16 @@
+body{
+    background: rgb(131,58,180);
+    background: linear-gradient(90deg, rgba(131,58,180,1) 0%, rgba(29,199,253,0.039653361344537785) 50%, rgba(252,176,69,1) 100%);    
+}
+.data{
+    font-size: large;
+    font-weight: 800;
+    color: black;
+    /* padding-right: 50%; */
+}
+.remove{
+    float: right;
+}
+.mybar{
+    background-color: rgb(193, 200, 201);
+}

@@ -1,0 +1,24 @@
+DISCRIPTION OF THE USERS INFORMATION TABLE
+
+SCHEMA FOR USER INFORMATION
+
++----------+-------------+------+-----+---------+-------+
+| Field    | Type        | Null | Key | Default | Extra |
++----------+-------------+------+-----+---------+-------+
+| uname    | varchar(50) | NO   | PRI | NULL    |       |
+| fname    | varchar(50) | NO   |     | NULL    |       |
+| lname    | varchar(50) | NO   |     | NULL    |       |
+| email    | varchar(50) | NO   |     | NULL    |       |
+| password | varchar(50) | NO   |     | NULL    |       |
++----------+-------------+------+-----+---------+-------+
+
+
+SCHEMA FOR DATA OF A PARTICULAR USER
+
++---------+--------------+------+-----+---------+-------+
+| Field   | Type         | Null | Key | Default | Extra |
++---------+--------------+------+-----+---------+-------+
+| name    | varchar(50)  | NO   | PRI | NULL    |       |
+| address | varchar(200) | NO   |     | NULL    |       |
++---------+--------------+------+-----+---------+-------+
+
