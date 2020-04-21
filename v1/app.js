@@ -4,17 +4,17 @@ const bodyparser = require('body-parser');
 const mysql = require('mysql');
 const fileUpload = require('express-fileupload');
 const fs = require('fs-extra');
+const cookieParser = require('cookie-parser');
 const app = express();
 app.use(bodyparser.urlencoded({extended: false}));
 app.use(bodyparser.json());
 app.use(fileUpload({
     createParentPath: true
 }));
-app.use(express.static('public'))
+app.use(express.static('public'));
+app.use(cookieParser());
 
-
-let userlogined = false,ismsg = false;
-let user,uname,pwd,user_data,msg;
+let usermap = new Map();
 
 const connection = mysql.createConnection({
     host: 'localhost',
@@ -23,6 +23,7 @@ const connection = mysql.createConnection({
     database: 'MYspace_db',// Database name for mysql db
     // insecureAuth: 'true',
 });
+
 connection.connect(function(err){
     if(err)
         console.log("error connecting to database");
@@ -36,59 +37,16 @@ app.listen(3000,function(){
 
 
 app.get('/',function(req,res){
-    if(userlogined == true){
-        res.redirect('/home');
+    let user = userAuthenticate(req.cookies.userId);
+    if(user == false){
+        res.render("home.ejs",{
+            msg:"",
+            ismsg:false,
+            login:false,
+            name:""
+        });
     }
     else{
-        res.render("home.ejs",{
-            msg:msg,
-            ismsg:ismsg,
-            login:userlogined,
-            name:uname
-        });
-    }   
-});
-
-// logout
-app.get('/logout',function(req,res){
-    ismsg = true;
-    if(userlogined == true)
-        msg = "GOOD BYE";
-    else
-        msg = "PLEASE LOGIN FIRST";
-    userlogined = false;
-    user = "";
-    res.redirect('/');
-});
-
-// login
-app.post('/login',function(req,res){
-    uname = req.body.uname;
-    pwd = req.body.pwd;
-    user = uname;
-    connection.query("SELECT * FROM users WHERE uname = '"+uname+"' AND password = '" + pwd +"';",function(err,result,field){
-        if(err){
-            console.log("error at login");
-            res.redirect('/');
-        }
-        else if(result.length == 0)
-        {
-            // user not found
-            msg = "USER NOT EXIST OR PASSWORD IS INCORRECT";
-            ismsg = true;
-            res.redirect('/');
-        }
-        else
-        {
-            // user found , login him
-            userlogined = true;
-            res.redirect('/');    
-        }
-    });
-});
-
-app.get('/home',function(req,res){
-    if(userlogined == true){
         connection.query("SELECT * FROM "+ user + "_data",function(err,results){
             if(err){
                 console.log("error at here");
@@ -96,7 +54,7 @@ app.get('/home',function(req,res){
             }
             res.render("after_login.ejs",{
                 login:true,
-                name:uname,
+                name:user,
                 is_upload_msg:false,
                 upload_msg:"",
                 user_data:results,
@@ -104,19 +62,56 @@ app.get('/home',function(req,res){
             });
         });
     }
-    else{
-        res.redirect('/');
+});
+
+// logout
+app.get('/logout',function(req,res){
+    let user = userAuthenticate(req.cookies.userId);
+    if(user == false){
+        res.render("home.ejs",{
+            msg:"Please Login First",
+            ismsg:true,
+            login:false,
+            name:""
+        });
     }
+    else{
+        usermap.delete(req.cookies.userId);
+        res.clearCookie("userId");
+        res.redirect('/');
+
+    }
+});
+
+// login
+app.post('/login',function(req,res){
+    let uname = req.body.uname;
+    let pwd = req.body.pwd;
+    connection.query("SELECT * FROM users WHERE uname = '"+uname+"' AND password = '" + pwd +"';",function(err,result,field){
+        if(err){
+            console.log("error at login");
+            res.redirect('/');
+        }
+        else if(result.length == 0)
+        {
+            res.redirect('/'); // user not found in database
+        }
+        else
+        {
+            // user found , login him
+            let newsessionId = Date.now()+"-"+uname + "-"+req.connection.remoteAddress;
+            usermap.set(newsessionId,uname);
+            res.cookie("userId",newsessionId);
+            res.redirect('/');    
+        }
+    });
 });
 
 
 
 // signup
 app.post('/signup',function(req,res){
-
-    userlogined = false;
-
-    uname = req.body.uname;
+    let uname = req.body.uname;
     let pwd = req.body.pwd;
     let email = req.body.email;
     let fname = req.body.fname;
@@ -126,8 +121,6 @@ app.post('/signup',function(req,res){
     connection.query(q,function(err,rows,fields){
         if(err)
         {
-            ismsg = true;
-            msg = "we found error while quering in database";
             res.redirect('/');
         }
         else
@@ -136,30 +129,34 @@ app.post('/signup',function(req,res){
             {
                 connection.query("CREATE TABLE "+uname+"_data (name varchar(50) NOT NULL,address varchar(200) NOT NULL,PRIMARY KEY(name))",function(err){
                     if(err){
-                        msg = "We got an error while fetching database , try again after sometime."
-                        ismsg = true;
+                        console.log(err);
                         res.redirect('/');
                     }
                     else{
                         connection.query("INSERT INTO users VALUES ('"+uname+"','"+fname+"','"+lname+"','"+email+"','"+pwd+"')",function(err){
                             if(err){
-                                msg = "We got error while inserting details on our database , try later";
-                                ismsg = true;
+                                console.log("error in db");
                                 res.redirect('/');
                             }
                             else{
-                                msg = "NEW USER CREATED";
-                                ismsg = true;
-                                res.redirect('/');
+                                res.render("home.ejs",{
+                                    msg:"NEW USER CREATED",
+                                    ismsg:true,
+                                    login:false,
+                                    name:""
+                                });
                             }
                         });
                     }
                 });
             }
             else{
-                ismsg = true;
-                msg = "username or email already exist";
-                res.redirect('/');
+                res.render("home.ejs",{
+                    msg:"User already exist",
+                    ismsg:true,
+                    login:false,
+                    name:""
+                });
             }
         }
     });
@@ -168,27 +165,42 @@ app.post('/signup',function(req,res){
 
 // about me page
 app.get('/about',function(req,res){
-    res.render("about.ejs",{
-        login:userlogined,
-        name:uname
-    });
+    let user = userAuthenticate(req.cookies.userId),userlogined;
+    if(user == false){
+        res.render("about.ejs",{
+            login:false,
+            name:""
+        });
+    }
+    else{
+        res.render("about.ejs",{
+            login:true,
+            name:user
+        });
+    }
 });
 
 // contact page
 app.get('/contact',function(req,res){
-    res.render("contact.ejs",{
-        login:userlogined,
-        name:uname
-    });
+    let user = userAuthenticate(req.cookies.userId),userlogined;
+    if(user == false){
+        res.render("contact.ejs",{
+            login:false,
+            name:""
+        });
+    }
+    else{
+        res.render("contact.ejs",{
+            login:true,
+            name:user
+        });
+    }
 });
 
 // delete user
 
 app.post('/deleteuser',function(req,res){
-
-    userlogined = false;
-
-    uname = req.body.uname;
+    let uname = req.body.uname;
     let pwd = req.body.pwd;
     let email = req.body.email;
     let fname = req.body.fname;
@@ -215,36 +227,38 @@ app.post('/deleteuser',function(req,res){
                             fs.remove(path,function(err4){
                                 if(!err4)
                                 {
-                                    ismsg = true;
-                                    msg = "USER DELETED";
-                                    res.redirect('/');
+                                    res.render("home.ejs",{
+                                        msg:"User Deleted",
+                                        ismsg:true,
+                                        login:false,
+                                        name:""
+                                    });
                                 }
                                 else{
-                                    ismsg = true;
-                                    msg = "SOME ERROR OCCURRED";
+                                    consolelog("error in fs-link");
                                     res.redirect('/');
                                 }
                             })
                         }
                         else{
-                            ismsg = true;
-                            msg = "USER NOT DELETED ";
+                            console.log("error in db while deleting");
                             res.redirect('/');
                         }
                     });
                 }
                 else{
-                    ismsg = true;
-                    msg = "SOME DETAILS ARE NOT MATCHED ";
                     res.redirect('/');
                 }
             });
         }
         else
         {
-            ismsg = true;
-            msg = "USER NOT FOUND";
-            res.redirect('/');
+            res.render("home.ejs",{
+                msg:"User Not found",
+                ismsg:true,
+                login:false,
+                name:""
+            });
         }
     });
 });
@@ -252,14 +266,16 @@ app.post('/deleteuser',function(req,res){
 // upload user data
 
 app.post('/upload',function(req,res){
-    if(userlogined == false)
-    {
-        ismsg = true;
-        msg = "PLEASE LOGIN FIRST";
-        res.end();
+    let user = userAuthenticate(req.cookies.userId);
+    if(user == false){
+        res.render("home.ejs",{
+            msg:msg,
+            ismsg:false,
+            login:false,
+            name:""
+        });
     }
-    else
-    {
+    else{
         if(!req.files)
         {
             res.end();
@@ -303,29 +319,30 @@ app.post('/upload',function(req,res){
 // download of user data
 
 app.get('/download/:x',function(req,res){
-    if(userlogined == true){
+    let user = userAuthenticate(req.cookies.userId);
+    if(user == false){
+        res.redirect('/');
+    }
+    else{
         let requestedfile = req.params.x;
         let path = __dirname+'/uploads/'+user+"_data/"+requestedfile;
         res.download(path,requestedfile);
-    }
-    else
-    {
-        res.redirect('/');
     }
 });
 
 // delete user data
 
 app.get('/delete/:x',function(req,res){
-    if(userlogined == true)
-    {
+    let user = userAuthenticate(req.cookies.userId);
+    if(user == false){
+        res.redirect('/');
+    }
+    else{
         let item_to_delete = req.params.x;
         let path =  __dirname+'/uploads/'+user+"_data/"+item_to_delete;
         connection.query("DELETE FROM "+ user + "_data WHERE name = '"+item_to_delete+"'",function(errrr,results){
             if(errrr){
                 console.log(errrr);
-                ismsg = true;
-                msg = "WE GOT ERROR ON DELETING";
                 res.redirect('/');
             }
             else
@@ -342,8 +359,13 @@ app.get('/delete/:x',function(req,res){
         });
         
     }
-    else
-    {
-        res.redirect('/');
-    }
 });
+
+
+function userAuthenticate(sessinID){
+    if(usermap.has(sessinID)){
+        return usermap.get(sessinID);
+    }
+    else
+        return false;
+}
