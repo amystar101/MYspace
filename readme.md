@@ -9,3 +9,7 @@ This is node based application uses mysql for database.
  6) old user account deletion.
  
  uploading of files are implemented using AJAX
+ 
+ Version 2 is added
+  features added - data shairing using shareable link - user authentication using passport js - mongodb database.
+  for more info read the readme of v2
