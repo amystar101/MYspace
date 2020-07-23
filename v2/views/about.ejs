@@ -1,0 +1,32 @@
+<%-include("partials/top.ejs"); %>
+
+<div class = "container">
+    <h2>About the app</h2>
+    <hr>
+    <h3>
+        This application  is created for creating your local home cloud with user authentication.
+        This is version 2 
+        <br>
+        This is node based application uses mongodb for database.
+        <br>
+        <strong>SUPPORTED FEATURES</strong>
+    </h3>
+        <ol><h4>
+            <li>User authentication</li>
+            <li>User authorization</li>
+            <li>data upload</li>
+            <li>data download</li>
+            <li>data deletion</li>
+            <li>data can be shared by generating the shareable link</li>
+        </h4></ol>
+        <h3>Mazor update from version 1 to version 2</h3>
+        <ul><h4>
+            <li>database shift - version 1 implements the mysql database and version 2 implements mongodb database</li>
+            <li>authentication update - version 1 implements authentication uses cookie based(naive just set and unset) that can be less secure
+                , wherease version 2 implements using passport js that is more secure </li>
+            
+            </h4></ul>
+</div>
+
+
+<%-include("partials/bottom.ejs"); %>

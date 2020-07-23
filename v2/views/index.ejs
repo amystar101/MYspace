@@ -1,0 +1,26 @@
+<%-include("partials/top.ejs"); %>
+  
+    <div class = "container">
+      <form action="login" method="POST">
+          <input type="text" name="username" id="" placeholder="USER NAME" required>
+          <input type="password" name = "password" placeholder="PASSWORD" required>
+          <br><br>
+          <button class = "btn btn-success">LOG IN</button>
+      </form>
+      <h2>OR</h2>
+      <hr>
+      <form action="/register" method="POST">
+          <input type="text" name = 'name' placeholder = "NAME" required>
+          <br>
+          <input type="email" name = 'email' placeholder = "EMAIL" required>
+          <br>
+          <input type="text" name= 'username' placeholder="USER NAME" required>
+          <input type="password" name = 'password' placeholder="PASSWORD" required>
+          <br>
+          <br>
+          <button class = "btn btn-primary">SIGN UP</button>
+      </form>
+      <hr>
+  </div>
+
+  <%-include("partials/bottom.ejs"); %>
