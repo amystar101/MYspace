@@ -18,12 +18,14 @@
             <li>data download</li>
             <li>data deletion</li>
             <li>data can be shared by generating the shareable link</li>
+            <li>Progress Bar</li>
         </h4></ol>
         <h3>Mazor update from version 1 to version 2</h3>
         <ul><h4>
             <li>database shift - version 1 implements the mysql database and version 2 implements mongodb database</li>
             <li>authentication update - version 1 implements authentication uses cookie based(naive just set and unset) that can be less secure
                 , wherease version 2 implements using passport js that is more secure </li>
+            <li>Data is sent in the forms of chunks( small pieces ) then rebuild the entire file at the server end. It helps in reducing the client load for sending entire file at once.</li>
             
             </h4></ul>
 </div>

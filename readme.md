@@ -11,5 +11,6 @@ This is node based application uses mysql for database.
  uploading of files are implemented using AJAX
  
  Version 2 is added
-  features added - data shairing using shareable link - user authentication using passport js - mongodb database.
+  features added - data shairing using shareable link - user authentication using passport js - mongodb database - Files uploaded in the form of chunks - Progress Loading is displayed - refactored CSS.
   for more info read the readme of v2
+
