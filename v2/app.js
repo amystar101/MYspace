@@ -20,12 +20,16 @@ mongoose.connect('mongodb://localhost/Myspace_v2',{useNewUrlParser: true, useFin
 
 // app configuration
 app.use(bodyparser.urlencoded({extended: false}));
-app.use(bodyparser.json());
+app.use(bodyparser.json({ limit: '50mb' }))
+
 app.use(fileUpload({
     createParentPath: true
 }));
 app.use(methodOverride('_method'));
 app.use(express.static('public'));
+
+
+
 
 
 // passport configration

@@ -1,56 +1,101 @@
 const express = require('express');
 const router = express.Router();
 const Data = require('../models/data');
-const fileUpload = require('express-fileupload');
 const fs = require('fs-extra');
 const Path = require('path');
 const User = require('../models/user');
 
 // data uploading
+
+let recieve_data = {};
+
 router.post('/data',function(req,res){
     if(req.isAuthenticated()){
-        if(req.files){
-            let file_to_upload = req.files.file;
+        let bytes = new Uint8Array(req.body.chunk.length);
+        
+        if(!(req.user.username in recieve_data)){
             let p1 = Path.resolve('./');
-            let path = p1+'/uploads/'+req.user.username+"_"+Date.now()+"_"+file_to_upload.name;
-            file_to_upload.mv(path,function(err){
+            // console.log(chunk)
+            let path = p1+'/uploads/'+req.user.username+"_"+Date.now()+"_"+req.body.name;
+            recieve_data[req.user.username] = {
+                "chunk_no" : -1,
+                "path" : path,
+            }
+        }
+        if(recieve_data[req.user.username].chunk_no == req.body.chunk_no-1){
+            // process
+            for (let i=0; i<req.body.chunk.length; i++)
+                bytes[i] = req.body.chunk.charCodeAt(i);
+            
+            fs.open(recieve_data[req.user.username].path,'a',function(err,fd){
                 if(err){
-                    res.redirect('back');
+                    console.log(err);
+                    res.end();
                 }
                 else{
-                    let newData = new Data({
-                        location : path,
-                        name : file_to_upload.name,
-                        shairing : false,
-                        owner : req.user._id
-                    });
-                    newData.save(function(err,savedFile){
+                    fs.write(fd,bytes,0,function(err,w){
                         if(err){
-                            console.log("error in saving in database");
-                            console.log(err);
-                            res.end();
+                            fs.unlink(recieve_data[req.user.username].path,function(err){
+                                if(err)
+                                    console.log("error at erasing the file");
+                                
+                                // remove the entry from recieve_data map
+                                id = req.user.username;
+                                delete recieve_data[id];
+                                res.send("Server error in wriiting your file");
+                                
+                            });
                         }
                         else{
-                            User.findById(req.user._id,function(err,user){
-                                if(!err){
-                                    user.data.push(newData);
-                                    user.save();
-                                    // console.log('user saved');
-                                }
-                            });
-                            let dataToSend = {
-                                "name" : newData.name,
-                                "_id" : newData._id,
-                                "shairing" : newData.shairing
+                            recieve_data[req.user.username].chunk_no += 1;
+                            if(req.body.end == false){
+                                res.send({"required":recieve_data[req.user.username].chunk_no+1});
                             }
-                            res.send(dataToSend);
+                            else{
+                                // file completed
+                                // adding file entry to data base
+                                let newData = new Data({
+                                    location : recieve_data[req.user.username].path,
+                                    name : req.body.name,
+                                    shairing : false,
+                                    owner : req.user._id
+                                });
+                                newData.save(function(err,savedFile){
+                                    if(err){
+                                        console.log("error in saving in database");
+                                        console.log(err);
+                                        res.end();
+                                    }
+                                    else{
+                                        User.findById(req.user._id,function(err,user){
+                                            if(!err){
+                                                user.data.push(newData);
+                                                user.save();
+                                                // console.log('user saved');
+                                                id = req.user.username;
+                                                delete recieve_data[id];
+
+                                                let dataToSend = {
+                                                    "required" : -1,
+                                                    "name" : newData.name,
+                                                    "_id" : newData._id,
+                                                    "shairing" : newData.shairing
+                                                }
+                                                res.send(dataToSend);
+                                            }
+                                        });
+                                    }
+                                });
+
+                            }
                         }
                     });
                 }
-            });
-        }   
+            });      
+        }
         else{
-            res.redidrect('back');
+            // you missed some chunks, request for missed ones
+            res.send({"required":recieve_data[req.user.username].chunk_no});
         }
     }
     else{
