@@ -7,29 +7,29 @@
     </head>
     <body>
         
-        <nav class="navbar navbar-default mybar">
+        <nav class="navbar navbar-default" id="mybar">
             <div class="container-fluid">
               <!-- Brand and toggle get grouped for better mobile display -->
-              <div class="navbar-header">
+              <div class="navbar-header" id="white">
                 <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
                   <span class="sr-only">Toggle navigation</span>
                   <span class="icon-bar"></span>
                   <span class="icon-bar"></span>
                   <span class="icon-bar"></span>
                 </button>
-                <a class="navbar-brand active" href="/">MYspace</a>
+                <a class="navbar-brand active" id="white" href="/">MYspace</a>
               </div>
           
               <!-- Collect the nav links, forms, and other content for toggling -->
               <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
                 <ul class="nav navbar-nav">
-                  <li ><a href="/">HOME <span class="sr-only">(current)</span></a></li>
+                  <li><a id="white" href="/">HOME <span class="sr-only">(current)</span></a></li>
                 </ul>
                 <ul class="nav navbar-nav navbar-right">
-                  <li><a href="/about">ABOUT</a></li>
-                  <li><a href="/contact">CONTACT ME</a></li>
+                  <li><a id="white" href="/about">ABOUT</a></li>
+                  <li><a id="white" href="/contact">CONTACT ME</a></li>
                   <% if(currentUser){ %>
-                      <li><a href="/logout"><%="Not " + currentUser.username %></a></li>
+                      <li><a id="white" href="/logout"><%="Not " + currentUser.username %></a></li>
                   <% } %>
                 </ul>
               </div><!-- /.navbar-collapse -->

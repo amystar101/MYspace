@@ -1,16 +1,69 @@
 body{
-    background: rgb(131,58,180);
-    background: linear-gradient(90deg, rgba(131,58,180,1) 0%, rgba(29,199,253,0.039653361344537785) 50%, rgba(252,176,69,1) 100%);    
+    background: #0F2027;  /* fallback for old browsers */
+    background: -webkit-linear-gradient(to right, #2C5364, #203A43, #0F2027);  /* Chrome 10-25, Safari 5.1-6 */
+    background: linear-gradient(to right, #2C5364, #203A43, #0F2027); /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
+
+    color: cornsilk;
+    
 }
-.data{
-    font-size: large;
-    font-weight: 800;
+input{
     color: black;
-    /* padding-right: 50%; */
+    background-color:rgb(94, 184, 233);
+    border-radius: 1.5em;
 }
-.remove{
-    float: right;
+button{
+    height: 100%;
+    width: auto;
+    display:inline-block;
+    margin:0 0.1em 0.1em 0;
+    border:0.16em solid rgba(255,255,255,0);
+    border-radius:0.5em;
+    box-sizing: border-box;
+    text-decoration:none;
+    font-family:'Roboto',sans-serif;
+    font-weight:400;
+    color: cornsilk;
+    text-align:center;
+    background-color: rgb(98, 138, 226);
 }
-.mybar{
-    background-color: rgb(193, 200, 201);
+button:hover{
+    font-weight: 700;
+}
+.listItem{
+    font-size: large;
+    font-weight: 600;
+    color:cornsilk;
+}
+.listItem:hover{
+    color: dimgray;
+}
+#mybar{
+    background-color: rgb(111, 133, 136);
+}
+
+#white{
+    color: cornsilk;
+}
+
+#white:hover{
+    font-weight: 700;
+    color: floralwhite;
+}
+
+.progressBar{
+    text-align: center;
+    width: 300px;
+    border-radius: 1.5em;
+}
+#progressFill{
+    display: flex;  
+    width: 0%;
+    height: 2em;
+    border-radius: 1.5em;
+    background-color: rgb(222, 223, 253);
+    border: black solid;
+}
+#percentage{
+    font-size: large;
+    font-weight: 500;
 }

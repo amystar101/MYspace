@@ -6,6 +6,11 @@
     <form method="POST" encType="multipart/form-data">
         <input type="file" name = "data" id="data" required>
         <br>
+        <div class="progressBar">
+            <span id ="percentage">0%</span>
+            <span id="progressFill"></span>
+        </div>
+        <br>
         <button class="btn btn-success" type="button" onclick="myupload()">UPLOAD</button>
     </form>
 </div>
